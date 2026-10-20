@@ -4,10 +4,11 @@
   gap: var(--space-10);
   align-items: center;
   justify-content: space-between;
-  height: 52px;
-  padding: 0 var(--space-12);
-  background: var(--surface);
+  height: 54px;
+  padding: 0 var(--space-14);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface), var(--accent) 3%), var(--surface));
   border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-control);
   -webkit-app-region: drag;
 }
 
@@ -77,12 +78,25 @@
 }
 
 .toolbar-title {
+  display: inline-flex;
+  gap: var(--space-8);
+  align-items: center;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: var(--text-base);
+  font-size: var(--text-md);
   font-weight: var(--weight-semibold);
   color: var(--text);
   white-space: nowrap;
+}
+
+.toolbar-title::before {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  content: "";
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .toolbar-lead {

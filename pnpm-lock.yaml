@@ -62,6 +62,9 @@ importers:
       codemirror-json5:
         specifier: ^1.0.3
         version: 1.0.3
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
       luby-transform:
         specifier: 0.2.0
         version: 0.2.0

@@ -5,6 +5,8 @@ import type { MessageKey } from "./translations";
 export type DashboardCardId =
   | "uploadTraffic"
   | "downloadTraffic"
+  | "traffic"
+  | "topOutbound"
   | "status"
   | "connections"
   | "systemProxy"
@@ -25,6 +27,8 @@ export const DASHBOARD_CARDS: Record<
 > = {
   uploadTraffic: { title: "Upload", icon: "upload", pairGroup: "traffic" },
   downloadTraffic: { title: "Download", icon: "download", pairGroup: "traffic" },
+  traffic: { title: "Traffic", icon: "speed" },
+  topOutbound: { title: "Top Outbounds", icon: "hub" },
   status: { title: "Status", icon: "bug_report", pairGroup: "statistics" },
   connections: { title: "Connections", icon: "cable", pairGroup: "statistics" },
   systemProxy: { title: "System HTTP Proxy", icon: "router", desktop: true },
@@ -35,8 +39,10 @@ export const DASHBOARD_CARDS: Record<
 const DEFAULT_CARD_ORDER: DashboardCardId[] = [
   "uploadTraffic",
   "downloadTraffic",
+  "traffic",
   "status",
   "connections",
+  "topOutbound",
   "systemProxy",
   "clashMode",
   "profile",
@@ -68,8 +74,7 @@ export function loadDashboardCardsConfig(desktop: boolean): DashboardCardsConfig
     let order = (Array.isArray(parsed.order) ? parsed.order : []).filter(
       (card): card is string => typeof card === "string" && known.has(card),
     );
-    const ordered = new Set(order);
-    order = order.concat(defaults.filter((card) => !ordered.has(card)));
+    order = mergeDefaultOrder(order, defaults);
     const enabledCards = new Set(enabled);
     for (const card of defaults) {
       if (DASHBOARD_CARDS[card].permanent && !enabledCards.has(card)) {
@@ -80,6 +85,26 @@ export function loadDashboardCardsConfig(desktop: boolean): DashboardCardsConfig
     return { enabled, order };
   }
   return { enabled: [...defaults], order: [...defaults] };
+}
+
+function mergeDefaultOrder(order: string[], defaults: DashboardCardId[]): string[] {
+  const merged = [...order];
+  for (const card of defaults) {
+    if (merged.includes(card)) {
+      continue;
+    }
+    const defaultIndex = defaults.indexOf(card);
+    let insertAt = merged.length;
+    for (let index = defaultIndex + 1; index < defaults.length; index += 1) {
+      const existing = merged.indexOf(defaults[index]);
+      if (existing >= 0) {
+        insertAt = existing;
+        break;
+      }
+    }
+    merged.splice(insertAt, 0, card);
+  }
+  return merged;
 }
 
 export function saveDashboardCardsConfig(config: DashboardCardsConfig) {

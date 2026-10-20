@@ -37,6 +37,7 @@ import {
   type DesktopHost,
 } from "./app/desktop";
 import { loadDisableDeprecatedWarnings } from "./app/deprecatedWarnings";
+import { startTrafficHistoryRecorder } from "./app/trafficHistory";
 import { dismissError, showError, useCurrentError } from "./app/errorStore";
 import { useDismiss, useStreamOutage, useUnaryOnce } from "./app/hooks";
 import { I18nProvider, useI18n, type Translate } from "./app/i18n";
@@ -101,6 +102,8 @@ import { NetworkQualityView, STUNTestView, ToolsView } from "./views/ToolsView";
 import { TaildropNavBadge, TaildropSendRequestDialog, TaildropView } from "./views/TaildropView";
 import { TailscaleEndpointView } from "./views/TailscaleView";
 import { TailscaleSSHView } from "./views/TerminalView";
+import { RoutingView } from "./views/RoutingView";
+import { TrafficView } from "./views/TrafficView";
 import { UsbipView } from "./views/UsbipView";
 import { OpenConnectView } from "./views/OpenConnectView";
 import { OpenVPNView } from "./views/OpenVPNView";
@@ -109,6 +112,8 @@ import { cx } from "./lib/cx";
 
 export type Route =
   | { page: "overview" }
+  | { page: "traffic" }
+  | { page: "routing" }
   | { page: "groups" }
   | { page: "connections" }
   | { page: "logs" }
@@ -163,6 +168,10 @@ function routeFromHash(locationHash: string): Route {
         };
       }
       return { page: "overview" };
+    case "traffic":
+      return { page: "traffic" };
+    case "routing":
+      return { page: "routing" };
     case "groups":
       return { page: "groups" };
     case "connections":
@@ -306,6 +315,10 @@ function routeTitle(route: Route, t: Translate, language: string): string {
   switch (route.page) {
     case "overview":
       return t("Dashboard");
+    case "traffic":
+      return t("Traffic");
+    case "routing":
+      return t("Routing");
     case "groups":
       return t("Groups");
     case "connections":
@@ -759,6 +772,13 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
 
   const started = serviceStatusType === ServiceStatus_Type.STARTED;
   const hasGroups = started && groups.data.loaded && groups.data.groups.length > 0;
+
+  useEffect(() => {
+    if (!started) {
+      return;
+    }
+    return startTrafficHistoryRecorder(api);
+  }, [api, started]);
   const known = serviceStatus.phase !== "connecting" || serviceStatus.data.status !== null;
 
   const groupsKnown = groups.data.loaded || groups.phase === "error";
@@ -769,6 +789,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
     const invisible =
       (route.page === "groups" && (!started || (groupsKnown && !hasGroups))) ||
       (route.page === "connections" && !started) ||
+      (route.page === "traffic" && !started) ||
       (isStartedOnlyToolsSubpage(route.page) && !started) ||
       (route.page === "tools/usbip" && capabilities.ready && !capabilities.supports("usbip")) ||
       (route.page === "tools/tailscale/taildrop" &&
@@ -867,6 +888,8 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
   const mainContent = (
     <main className={styles.content}>
       {route.page === "overview" && <OverviewView />}
+      {route.page === "traffic" && <TrafficView />}
+      {route.page === "routing" && <RoutingView />}
       {route.page === "groups" && <GroupsView />}
       {route.page === "connections" && <ConnectionsView />}
       {route.page === "logs" && <LogsView />}
@@ -963,11 +986,16 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
             {started ? (
               <>
                 {navItem("overview", t("Overview"), "dashboard", route.page === "overview")}
+                {navItem("traffic", t("Traffic"), "speed", route.page === "traffic")}
                 {hasGroups && navItem("groups", t("Groups"), "folder", route.page === "groups")}
                 {navItem("connections", t("Connections"), "swap_vert", route.page === "connections")}
+                {navItem("routing", t("Routing"), "route", route.page === "routing")}
               </>
             ) : (
-              navItem("overview", t("Dashboard"), "dashboard", route.page === "overview")
+              <>
+                {navItem("overview", t("Dashboard"), "dashboard", route.page === "overview")}
+                {navItem("routing", t("Routing"), "route", route.page === "routing")}
+              </>
             )}
             {mainPages}
           </nav>
@@ -978,8 +1006,10 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
               {serverInfo && <span className={styles.sidebarBrandVersion}>{serverInfo.version}</span>}
             </div>
             {navItem("overview", t("Overview"), "dashboard", route.page === "overview")}
+            {started && navItem("traffic", t("Traffic"), "speed", route.page === "traffic")}
             {hasGroups && navItem("groups", t("Groups"), "folder", route.page === "groups")}
             {started && navItem("connections", t("Connections"), "swap_vert", route.page === "connections")}
+            {navItem("routing", t("Routing"), "route", route.page === "routing")}
             {mainPages}
             <ServerPicker
               serversState={props.serversState}

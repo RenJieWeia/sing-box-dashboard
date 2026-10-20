@@ -24,10 +24,10 @@
 }
 
 .text-metric {
-  font-size: var(--text-2xl);
+  font-size: var(--text-3xl);
   font-weight: var(--weight-semibold);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.035em;
 }
 
 .text-headline,
@@ -210,7 +210,10 @@ a.menu-item {
 }
 
 .page {
-  padding: var(--space-32) var(--space-36) var(--space-56);
+  width: 100%;
+  max-width: 1480px;
+  padding: var(--space-36) var(--space-40) var(--space-56);
+  margin: 0 auto;
   animation: page-in 0.25s ease-out;
 }
 
@@ -227,11 +230,14 @@ a.menu-item {
   flex-shrink: 0;
   gap: var(--space-12);
   align-items: center;
+  padding-bottom: var(--space-16);
   margin-bottom: var(--space-24);
+  border-bottom: 1px solid var(--border);
 }
 
 .page-title {
   margin: 0;
+  line-height: 1.12;
 }
 
 .page-header .actions {
@@ -260,27 +266,51 @@ a.menu-item {
 }
 
 .card {
+  position: relative;
   padding: var(--space-20);
-  background: var(--card);
+  background: var(--card-gradient);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  transition: border-color var(--transition-medium);
+  transition: border-color var(--transition-medium), box-shadow var(--transition-medium), transform var(--transition-medium);
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .card-header {
   display: flex;
-  gap: var(--space-8);
+  gap: var(--space-10);
   align-items: center;
-  margin-bottom: var(--space-10);
+  padding-bottom: var(--space-12);
+  margin-bottom: var(--space-14);
+  border-bottom: 1px solid var(--border);
 }
 
 .card-header:last-child {
+  padding-bottom: 0;
   margin-bottom: 0;
+  border-bottom: 0;
 }
 
-.card-header > .icon {
-  color: var(--text-faint);
+.card-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-radius: var(--radius-control);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent), transparent 82%);
+}
+
+.card-icon .icon {
+  width: 16px;
+  height: 16px;
 }
 
 .card-header .actions {
@@ -310,7 +340,8 @@ a.menu-item {
 }
 
 .data-line .value {
-  font-weight: var(--weight-medium);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
   font-variant-numeric: tabular-nums;
   text-align: end;
   overflow-wrap: anywhere;
@@ -323,7 +354,7 @@ a.menu-item {
 
 .nav-list {
   overflow: hidden;
-  background: var(--card);
+  background: var(--card-gradient);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
@@ -479,12 +510,14 @@ a.nav-line {
 
 .button.primary {
   color: var(--on-accent);
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   border-color: transparent;
+  box-shadow: 0 4px 12px -7px color-mix(in srgb, var(--accent), transparent 30%);
 }
 
 .button.primary:hover {
-  background: var(--accent-strong);
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent-strong));
+  box-shadow: 0 6px 16px -8px color-mix(in srgb, var(--accent), transparent 24%);
 }
 
 .button.danger {
@@ -562,9 +595,10 @@ a.nav-line {
   gap: var(--space-2);
   height: var(--control-height);
   padding: var(--space-2);
-  background: var(--inset);
+  background: color-mix(in srgb, var(--inset), var(--card) 24%);
   border: 1px solid var(--border);
   border-radius: var(--radius-control);
+  box-shadow: inset 0 1px 2px rgb(19 26 42 / 4%);
 }
 
 .segmented button {
@@ -581,9 +615,9 @@ a.nav-line {
 }
 
 .segmented button.active {
-  color: var(--text);
+  color: var(--accent-strong);
   background: var(--card);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+  box-shadow: var(--shadow-control);
 }
 
 .segmented.full {
@@ -616,6 +650,7 @@ a.nav-line {
   color: var(--text-secondary);
   white-space: nowrap;
   background: var(--neutral-soft);
+  border: 1px solid transparent;
   border-radius: var(--radius-pill);
 }
 
@@ -1087,7 +1122,7 @@ button.settings-row:focus-visible {
 
 .detail-card {
   padding: var(--space-2) var(--space-14);
-  background: var(--card);
+  background: var(--card-gradient);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
@@ -1150,9 +1185,15 @@ button.settings-row:focus-visible {
 }
 
 .empty-state .icon {
+  box-sizing: content-box;
   display: block;
+  width: 22px;
+  height: 22px;
+  padding: var(--space-14);
   margin: 0 auto var(--space-10);
-  color: var(--border-strong);
+  color: var(--text-faint);
+  background: var(--neutral-soft);
+  border-radius: 50%;
 }
 
 .empty-state .spinner {
@@ -1179,8 +1220,9 @@ button.settings-row:focus-visible {
   font-size: var(--text-base);
   color: var(--text);
   background: var(--medium-soft);
-  border: 1px solid var(--medium);
+  border: 1px solid color-mix(in srgb, var(--medium), transparent 56%);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-control);
 }
 
 .banner.error {

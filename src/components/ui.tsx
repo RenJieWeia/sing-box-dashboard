@@ -24,7 +24,11 @@ export function Card(props: { icon?: IconName; title?: ReactNode; actions?: Reac
     <div className={cx("card", props.wide && "wide", props.className)}>
       {(props.title || props.actions) && (
         <div className="card-header">
-          {props.icon && <Icon name={props.icon} />}
+          {props.icon && (
+            <span className="card-icon">
+              <Icon name={props.icon} />
+            </span>
+          )}
           <span>{props.title}</span>
           {props.actions && <div className="actions">{props.actions}</div>}
         </div>
@@ -905,7 +909,8 @@ export function SecretInput(props: {
 }
 
 export function Sparkline(props: { data: number[]; height?: number; color?: string; capacity?: number }) {
-  const height = props.height ?? 46;
+  const gradientId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const height = props.height ?? 52;
   const width = 300;
   const capacity = props.capacity ?? 30;
   const max = Math.max(...props.data, 1);
@@ -913,10 +918,15 @@ export function Sparkline(props: { data: number[]; height?: number; color?: stri
   const offset = Math.max(0, capacity - props.data.length);
   const points = props.data.map((value, index) => {
     const x = (offset + index) * stepX;
-    const y = height - 3 - (value / (max * 1.2)) * (height - 6);
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
+    const y = height - 4 - (value / (max * 1.2)) * (height - 10);
+    return { x, y };
   });
   const color = props.color ?? "var(--accent)";
+  const path = points.map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(" ");
+  const area =
+    points.length > 1
+      ? `${points[0].x.toFixed(1)},${height} ${path} ${points[points.length - 1].x.toFixed(1)},${height}`
+      : "";
   return (
     <svg
       width="100%"
@@ -924,19 +934,31 @@ export function Sparkline(props: { data: number[]; height?: number; color?: stri
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
       style={{ display: "block" }}
+      aria-hidden="true"
     >
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <line
+        x1="0"
+        y1={height - 4}
+        x2={width}
+        y2={height - 4}
+        stroke="var(--border)"
+        strokeWidth="1"
+        vectorEffect="non-scaling-stroke"
+      />
       {points.length > 1 && (
         <>
-          <polygon
-            points={`${points[0].split(",")[0]},${height} ${points.join(" ")} ${points[points.length - 1].split(",")[0]},${height}`}
-            fill={color}
-            opacity="0.1"
-          />
+          <polygon points={area} fill={`url(#${gradientId})`} />
           <polyline
-            points={points.join(" ")}
+            points={path}
             fill="none"
             stroke={color}
-            strokeWidth="1.8"
+            strokeWidth="2.2"
             strokeLinejoin="round"
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"

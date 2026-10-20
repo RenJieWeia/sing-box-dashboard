@@ -1,0 +1,118 @@
+.rule-dialog {
+  min-width: min(620px, calc(100vw - 48px));
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-12);
+}
+
+.section {
+  padding-top: var(--space-14);
+  margin-top: var(--space-14);
+  border-top: 1px solid var(--border);
+}
+
+.section-header {
+  display: flex;
+  gap: var(--space-12);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-10);
+}
+
+.section-title {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.chip {
+  padding: var(--space-4) var(--space-10);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.chip:hover {
+  border-color: var(--border-strong);
+}
+
+.chip.chip-active {
+  font-weight: var(--weight-semibold);
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.conditions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin-bottom: var(--space-10);
+}
+
+.condition-row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+.condition-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.json-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.json-input {
+  width: 100%;
+  min-height: 280px;
+  padding: var(--space-12);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--text);
+  resize: vertical;
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.json-input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+@media (max-width: 720px) {
+  .condition-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .condition-label {
+    grid-column: 1 / -1;
+  }
+}
